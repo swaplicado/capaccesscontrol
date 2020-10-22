@@ -21,11 +21,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
@@ -48,6 +51,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private CAPEmployeeUI oEmployeeUI;
     private List<CAPLogUI> lLog;
     private CAPLogUI oLog;
+    private CAPSource oEnumSource;
 
     /**
      * Creates new form CAPMainUI
@@ -84,6 +88,10 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         oCAPRequest = new CAPRequest(oConfig.getMailCAP(), oConfig.getPswdCAP(), oConfig.getUrlLogin());
         
         resetFields();
+        
+        jlTitle.setText("<html><body><div>CAP Access Control <br> " + oConfig.getCompanyData().getCompanyName() + "</div></body></html>");
+        jlTitle.setFont(new Font("Verdana", Font.PLAIN, 12));
+        
         jbSearch.addActionListener(this);
         jbSearchByEmployee.addActionListener(this);
         jbSearchSelectedEmployee.addActionListener(this);
@@ -102,6 +110,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
                     int index = list.locationToIndex(evt.getPoint());
                     if (index > -1) {
                         oEmployeeUI = (CAPEmployeeUI) list.getModel().getElementAt(index);
+                        oEnumSource = CAPSource.NOMBRE;
                         actionSearchEmployeeById(oEmployeeUI.getIdEmployee());
                     }
                 }
@@ -130,13 +139,14 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         lLog = new ArrayList();
         
         disableSearchByEmployee();
+        
+        oCAPRequest.login();
     }
     
     /**
      * Reiniciar etiquetas y campos de texto.
      */
     private void resetFields() {
-        jtfSearching.setText("");
         jtfNumEmployee.setText("");
         jtfNumEmp.setText("");
         jtfNameEmp.setText("");
@@ -178,7 +188,8 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      * Iniciar reloj y visualizar en pantalla.
      */
     private void startClock() {
-        SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyy HH:mm:ss");
+        SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
+        jTextField1.setFont(new Font("Verdana", Font.BOLD, 16));
         
         javax.swing.Timer t = new javax.swing.Timer(1000,
                 new ActionListener() {
@@ -216,6 +227,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         
         oLog = new CAPLogUI();
         oLog.setTimeStamp(tDate);
+        this.oEnumSource = CAPSource.CODIGO;
         showTimestamp(tDate);
         CAPResponse response = oCAPRequest.requestByNumEmployee(tDate, numEmp, oConfig.getSearchScheduleDays(), oConfig.getUrlNumEmployee());
         
@@ -243,6 +255,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private void actionSearchSelectedEmployee() {
         oEmployeeUI = jlistSearchEmployees.getSelectedValue();
         actionSearchEmployeeById(oEmployeeUI.getIdEmployee());
+        this.oEnumSource = CAPSource.NOMBRE;
     }
     
     /**
@@ -292,21 +305,25 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         oLog.setNumEmployee(response.getEmployee().getNum_employee());
         oLog.setNameEmployee(response.getEmployee().getName());
         
+        oLog.setSource(oEnumSource);
+        
         // se valida el acceso mediante la respuesta del servidor
         if (! validateAccess(response)) {
             //si se niega el acceso se muestra el mensaje en pantalla y se escribe en la bitácora
             oLog.setAuthorized(false);
             lLog.add(0, oLog);
             updateLog();
+            oEnumSource = null;
             
             return;
         }
         
         // si el acceso al empleado es permitido se muestra la autorización y se escribe el suceso en la biácora
-        this.showAutorized(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch());
+        this.showAutorized(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch(), false);
         oLog.setAuthorized(true);
         lLog.add(0, oLog);
         updateLog();
+        oEnumSource = null;
     }
     
     /**
@@ -382,7 +399,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      * @param dtDate 
      */
     private void showTimestamp(Date dtDate) {
-        DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         String sDate = df.format(dtDate);
         
         jtfTimestamp.setText(sDate);
@@ -396,7 +413,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      */
     private boolean validateResponse(CAPResponse response) {
         if (response.getEmployee() == null) {
-            showUnauthorized("No se encontró al empleado en el sistema", "", "", false);
+            showUnauthorized("No se encontró al empleado en el sistema", "", "", false, false);
             return false;
         }
         
@@ -416,7 +433,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private boolean validateAccess(CAPResponse response) {
         if (! response.getEmployee().isIs_active() || response.getEmployee().isIs_delete()) {
             String reason = "El empleado está desactivado en el sistema";
-            showUnauthorized(reason, "", "", false);
+            showUnauthorized(reason, "", "", false, false);
             oLog.setReasons(reason);
             
             return false;
@@ -437,7 +454,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
                 sOut = response.getNextSchedule().getOutDateTimeSch();
             }
             String reasons = "El empleado tiene programado: " + reason + " para el día de hoy";
-            showUnauthorized(reasons, sIn, sOut, true);
+            showUnauthorized(reasons, sIn, sOut, true, false);
             oLog.setReasons(reasons);
             
             return false;
@@ -456,7 +473,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
             }
             
             String reasons = "El empleado tiene incidencias: " + reason + " para el día de hoy";
-            showUnauthorized(reasons, sIn, sOut, true);
+            showUnauthorized(reasons, sIn, sOut, true, false);
             oLog.setReasons(reasons);
             
             return false;
@@ -470,7 +487,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
                 sOut = response.getSchedule().getOutDateTimeSch();
                 
                 String reasons = "El empleado está fuera de su horario";
-                showUnauthorized(reasons, sIn, sOut, false);
+                showUnauthorized(reasons, sIn, sOut, false, false);
                 oLog.setReasons(reasons);
                 
                 return false;
@@ -486,7 +503,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
             }
             
             String reasons = "El empleado no tiene horario asignado para el día de hoy";
-            showUnauthorized(reasons, sIn, sOut, true);
+            showUnauthorized(reasons, sIn, sOut, true, false);
             oLog.setReasons(reasons);
             
             return false;
@@ -501,7 +518,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      * @param scheduleOut
      * @param isNext 
      */
-    private void showUnauthorized(String reason, String scheduleIn, String scheduleOut, boolean isNext) {
+    private void showUnauthorized(String reason, String scheduleIn, String scheduleOut, boolean isNext, boolean fromLog) {
         String text = "<html>"
                         + "<body style='text-align: center; background-color: red;'>"
                             + "<div style='height: 200px; width: 180px; top: 50%;'><br><br>ACCESO<br>DENEGADO</div>"
@@ -521,16 +538,32 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jlReason.setFont(new Font("Verdana", Font.PLAIN, 14));
         
         if (! isNext) {
-            jlIn.setText("Horario entrada");
-            jlOut.setText("Horario salida");
+            jlIn.setText("Horario entrada:");
+            jlOut.setText("Horario salida:");
         }
         else {
-            jlIn.setText("Próximo horario entrada");
-            jlOut.setText("Próximo horario salida");
+            jlIn.setText("Próximo horario entrada:");
+            jlOut.setText("Próximo horario salida:");
         }
         
-        jtfScheduleIn.setText(scheduleIn);
-        jtfScheduleOut.setText(scheduleOut);
+        String schIn = "";
+        String schOut = "";
+        
+        if (! scheduleIn.isEmpty()) {
+            schIn = this.formatStringDate(scheduleIn);
+            schOut = this.formatStringDate(scheduleOut);
+        }
+        else if (fromLog) {
+            schIn = "N/A";
+            schOut = "N/A";
+        }
+        else {
+            schIn = "Sin horario";
+            schOut = "Sin horario";
+        }
+        
+        jtfScheduleIn.setText(schIn);
+        jtfScheduleOut.setText(schOut);
     }
     
     /**
@@ -539,7 +572,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      * @param scheduleIn
      * @param scheduleOut 
      */
-    private void showAutorized(String scheduleIn, String scheduleOut) {
+    private void showAutorized(String scheduleIn, String scheduleOut, boolean fromLog) {
         String text = "<html>"
                         + "<body style='text-align: center; background-color: green;'>"
                             + "<div style='height: 200px; width: 180px; top: 50%;'><br><br>ACCESO<br>AUTORIZADO</div>"
@@ -549,11 +582,27 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jlResultMessage.setText(text);
         jlResultMessage.setFont(new Font("Verdana", Font.PLAIN, 32));
         
-        jlIn.setText("Horario entrada");
-        jlOut.setText("Horario salida");
+        jlIn.setText("Horario entrada:");
+        jlOut.setText("Horario salida:");
         
-        jtfScheduleIn.setText(scheduleIn);
-        jtfScheduleOut.setText(scheduleOut);
+        String schIn = "";
+        String schOut = "";
+        
+        if (! scheduleIn.isEmpty()) {
+            schIn = this.formatStringDate(scheduleIn);
+            schOut = this.formatStringDate(scheduleOut);
+        }
+        else if (fromLog) {
+            schIn = "N/A";
+            schOut = "N/A";
+        }
+        else {
+            schIn = "Sin horario";
+            schOut = "Sin horario";
+        }
+        
+        jtfScheduleIn.setText(schIn);
+        jtfScheduleOut.setText(schOut);
     }
     
     /**
@@ -592,13 +641,33 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         showTimestamp(oLog.getTimeStamp());
         
         if (oLog.isAuthorized()) {
-            showAutorized("", "");
+            showAutorized("", "", true);
         }
         else {
-            showUnauthorized(oLog.getReasons(), "", "", false);
+            showUnauthorized(oLog.getReasons(), "", "", false, true);
         }
         
         jtfNumEmployee.requestFocusInWindow();
+    }
+    
+    /**
+     * Formato de string yyyy-MM-dd HH:mm a dd/MM/yyy HH:mm:ss.
+     * 
+     * @param dtDate
+     * @return 
+     */
+    private String formatStringDate(String dtDate) {
+        SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyy HH:mm:ss");
+        
+        try {  
+            Date date1 = new SimpleDateFormat("yyyy-MM-dd HH:mm").parse(dtDate);
+            
+            return format1.format(date1);
+        } catch (ParseException ex) {
+            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return "";
     }
     
     @Override
@@ -621,6 +690,10 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         }
     }
 
+    public void setoEnumSource(CAPSource oEnumSource) {
+        this.oEnumSource = oEnumSource;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -634,7 +707,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jPanel4 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
+        jlTitle = new javax.swing.JLabel();
         jPanel8 = new javax.swing.JPanel();
         jLImage = new javax.swing.JLabel();
         jPanel9 = new javax.swing.JPanel();
@@ -644,11 +717,9 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jPanel11 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jtfNumEmployee = new javax.swing.JTextField();
-        jPanel12 = new javax.swing.JPanel();
-        jLabel6 = new javax.swing.JLabel();
         jbSearch = new javax.swing.JButton();
         jPanel13 = new javax.swing.JPanel();
-        jtfSearching = new javax.swing.JTextField();
+        jlSearching = new javax.swing.JLabel();
         jbSearchByEmployee = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
@@ -704,8 +775,8 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
 
         jPanel4.setLayout(new java.awt.GridLayout(1, 2));
 
-        jLabel1.setText("CAP Access Control");
-        jPanel7.add(jLabel1);
+        jlTitle.setText("CAP Access Control");
+        jPanel7.add(jlTitle);
 
         jPanel5.add(jPanel7);
 
@@ -731,10 +802,10 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jPanel5.add(jPanel10);
 
         jLabel5.setText("Num. Empleado:");
-        jLabel5.setPreferredSize(new java.awt.Dimension(125, 23));
+        jLabel5.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel11.add(jLabel5);
 
-        jtfNumEmployee.setPreferredSize(new java.awt.Dimension(175, 23));
+        jtfNumEmployee.setPreferredSize(new java.awt.Dimension(135, 23));
         jtfNumEmployee.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 onKeyPressedNumEmp(evt);
@@ -742,19 +813,13 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         });
         jPanel11.add(jtfNumEmployee);
 
+        jbSearch.setText("Buscar");
+        jPanel11.add(jbSearch);
+
         jPanel5.add(jPanel11);
 
-        jLabel6.setPreferredSize(new java.awt.Dimension(200, 23));
-        jPanel12.add(jLabel6);
-
-        jbSearch.setText("Buscar");
-        jPanel12.add(jbSearch);
-
-        jPanel5.add(jPanel12);
-
-        jtfSearching.setEditable(false);
-        jtfSearching.setPreferredSize(new java.awt.Dimension(175, 23));
-        jPanel13.add(jtfSearching);
+        jlSearching.setPreferredSize(new java.awt.Dimension(175, 23));
+        jPanel13.add(jlSearching);
 
         jbSearchByEmployee.setText("Búsqueda por nombre");
         jPanel13.add(jbSearchByEmployee);
@@ -763,7 +828,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
 
         jPanel4.add(jPanel5);
 
-        jLabel8.setText("Búsqueda de Empleado");
+        jLabel8.setText("Búsqueda de empleado");
         jLabel8.setPreferredSize(new java.awt.Dimension(150, 23));
         jPanel25.add(jLabel8);
 
@@ -919,17 +984,14 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLImage;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
@@ -968,6 +1030,8 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jlOut;
     private javax.swing.JLabel jlReason;
     private javax.swing.JLabel jlResultMessage;
+    private javax.swing.JLabel jlSearching;
+    private javax.swing.JLabel jlTitle;
     private javax.swing.JList<CAPLogUI> jlistLog;
     private javax.swing.JList<CAPEmployeeUI> jlistSearchEmployees;
     private javax.swing.JTextField jtfNameEmp;
@@ -976,7 +1040,6 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JTextField jtfScheduleIn;
     private javax.swing.JTextField jtfScheduleOut;
     private javax.swing.JTextField jtfSearchEmployee;
-    private javax.swing.JTextField jtfSearching;
     private javax.swing.JTextField jtfTimestamp;
     // End of variables declaration//GEN-END:variables
 }

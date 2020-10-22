@@ -22,6 +22,7 @@ public class CAPLogUI {
     private ImageIcon photo;
     private boolean authorized;
     private String reasons;
+    private CAPSource source;
 
     public String getNumEmployee() {
         return numEmployee;
@@ -71,10 +72,18 @@ public class CAPLogUI {
         this.reasons = reasons;
     }
 
+    public CAPSource getSource() {
+        return source;
+    }
+
+    public void setSource(CAPSource source) {
+        this.source = source;
+    }
+
     @Override
     public String toString() {
-        DateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm");
-        return numEmployee + "-" + nameEmployee + "/" + (authorized ? "PERMITIDO" : "DENEGADO") + "" + df.format(timeStamp);
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        return df.format(timeStamp) + " - " + numEmployee + "-" + nameEmployee + " / " + (authorized ? "AUTORIZADO" : "DENEGADO") + " - " + source;
     }
     
     

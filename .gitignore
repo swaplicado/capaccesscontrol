@@ -24,3 +24,12 @@ hs_err_pid*
 
 caprelojchecador.properties
 cfg.json
+/nbproject/private/
+/build/
+/dist/
+manifest.mf
+nbbuild.xml
+nbproject/build-impl.xml
+nbproject/genfiles.properties
+nbproject/project.properties
+nbproject/project.xml

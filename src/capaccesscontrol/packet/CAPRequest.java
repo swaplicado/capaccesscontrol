@@ -192,7 +192,7 @@ public class CAPRequest {
     /**
      * Solicitar y realizar login
      */
-    private void login() {
+    public void login() {
         try {
             URLConnection connection = new URL(this.urlLoginCAP).openConnection();
             

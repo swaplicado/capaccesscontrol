@@ -8,6 +8,7 @@ package capaccesscontrol.core;
 import Formularios.Checador;
 import Formularios.envioCorreo;
 import capaccesscontrol.ui.CAPMainUI;
+import capaccesscontrol.ui.CAPSource;
 import com.digitalpersona.onetouch.DPFPDataPurpose;
 import com.digitalpersona.onetouch.DPFPFeatureSet;
 import com.digitalpersona.onetouch.DPFPGlobal;
@@ -138,6 +139,7 @@ public class CAPDigitalPersona {
             int id = this.identifyFingerprint();
             
             if (id > 0) {
+                oCapGui.setoEnumSource(CAPSource.HUELLA);
                 oCapGui.actionSearchEmployeeById(id);
             }
             
