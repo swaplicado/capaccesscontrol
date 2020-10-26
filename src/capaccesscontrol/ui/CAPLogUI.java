@@ -16,6 +16,8 @@ import javax.swing.ImageIcon;
  */
 public class CAPLogUI {
     
+    private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    
     private String numEmployee;
     private String nameEmployee;
     private Date timeStamp;
@@ -78,6 +80,16 @@ public class CAPLogUI {
 
     public void setSource(CAPSource source) {
         this.source = source;
+    }
+    
+    public String[] toRow() {
+        return new String[] {
+            this.numEmployee,
+            this.nameEmployee,
+            format.format(this.timeStamp),
+            this.authorized ? "AUTORIZADO" : "DENEGADO",
+            this.source.toString()
+        };
     }
 
     @Override

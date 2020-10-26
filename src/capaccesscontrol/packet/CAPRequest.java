@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -177,13 +178,17 @@ public class CAPRequest {
             Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch(com.fasterxml.jackson.core.JsonParseException ex) {
-            this.login();
-            return this.request(sURL, query);
+            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            
+            if (this.login() == 200) {
+                return this.request(sURL, query);
+            }
         }
         catch (IOException ex) {
             Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
-            this.login();
-            return this.request(sURL, query);
+            if (this.login() == 200) {
+                return this.request(sURL, query);
+            }
         }
         
         return null;
@@ -192,7 +197,7 @@ public class CAPRequest {
     /**
      * Solicitar y realizar login
      */
-    public void login() {
+    public int login() {
         try {
             URLConnection connection = new URL(this.urlLoginCAP).openConnection();
             
@@ -217,6 +222,8 @@ public class CAPRequest {
                 CAPLoginResponse capResponse = mapper.readValue(responseBody, CAPLoginResponse.class);
                 
                 this._TOKEN = capResponse.getAccess_token();
+                
+                return 200;
             }
         }
         catch (UnsupportedEncodingException ex) {
@@ -226,7 +233,14 @@ public class CAPRequest {
             Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (IOException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+            
+            if (ex.getMessage().equals("Connection refused: connect")) {
+                JOptionPane.showMessageDialog(null, "No hay conexión con el servidor", "Error", JOptionPane.ERROR_MESSAGE);
+                return -1;
+            }
         }
+        
+        return 0;
     }
 }

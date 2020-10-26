@@ -9,6 +9,7 @@ import capaccesscontrol.ui.CAPMainUI;
 import capaccesscontrol.config.CAPConfig;
 import capaccesscontrol.config.CAPConfigReader;
 import capaccesscontrol.core.CAPDigitalPersona;
+import capaccesscontrol.ui.CAPSource;
 import javax.swing.JFrame;
 
 /**

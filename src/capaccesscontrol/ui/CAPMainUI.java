@@ -15,6 +15,7 @@ import capaccesscontrol.packet.CAPEventResponse;
 import capaccesscontrol.packet.CAPRequest;
 import capaccesscontrol.packet.CAPResponse;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -35,6 +36,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 /**
  *
@@ -52,6 +54,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private List<CAPLogUI> lLog;
     private CAPLogUI oLog;
     private CAPSource oEnumSource;
+    private CAPLogUIModel oModel;
 
     /**
      * Creates new form CAPMainUI
@@ -92,6 +95,12 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jlTitle.setText("<html><body><div>CAP Access Control <br> " + oConfig.getCompanyData().getCompanyName() + "</div></body></html>");
         jlTitle.setFont(new Font("Verdana", Font.PLAIN, 12));
         
+        jTableLog.getColumnModel().getColumn(0).setPreferredWidth(100);
+        jTableLog.getColumnModel().getColumn(1).setPreferredWidth(50);
+        jTableLog.getColumnModel().getColumn(2).setPreferredWidth(50);
+        jTableLog.getColumnModel().getColumn(3).setPreferredWidth(200);
+        jTableLog.getColumnModel().getColumn(4).setPreferredWidth(75);
+        
         jbSearch.addActionListener(this);
         jbSearchByEmployee.addActionListener(this);
         jbSearchSelectedEmployee.addActionListener(this);
@@ -120,18 +129,15 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         /**
          * Detectar doble click en la lista de la bitácora para visualizar datos.
          */
-        jlistLog.addMouseListener(new MouseAdapter() {
+        jTableLog.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                JList list = (JList)evt.getSource();
-                if (evt.getClickCount() == 2) {
-
-                    // Double-click detected
-                    int index = list.locationToIndex(evt.getPoint());
-                    if (index > -1) {
-                        oLog = (CAPLogUI) list.getModel().getElementAt(index);
-                        showLog();
-                    }
+                JTable table = (JTable) evt.getSource();
+                Point point = evt.getPoint();
+                int row = table.rowAtPoint(point);
+                if (evt.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    oLog = lLog.get(row);
+                    showLog();
                 }
             }
         });
@@ -140,13 +146,15 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         
         disableSearchByEmployee();
         
-        oCAPRequest.login();
+        if (oCAPRequest.login() == -1) {
+            System.exit(-1);
+        }
     }
     
     /**
      * Reiniciar etiquetas y campos de texto.
      */
-    private void resetFields() {
+    public void resetFields() {
         jtfNumEmployee.setText("");
         jtfNumEmp.setText("");
         jtfNameEmp.setText("");
@@ -154,6 +162,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jlImgPhoto.setText("");
         javax.swing.ImageIcon photoIcon = new ImageIcon();
         jlImgPhoto.setIcon(photoIcon);
+        jtfTimestamp.setText("");
     }
     
     /**
@@ -226,9 +235,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         tDate = new Date();
         
         oLog = new CAPLogUI();
-        oLog.setTimeStamp(tDate);
         this.oEnumSource = CAPSource.CODIGO;
-        showTimestamp(tDate);
         CAPResponse response = oCAPRequest.requestByNumEmployee(tDate, numEmp, oConfig.getSearchScheduleDays(), oConfig.getUrlNumEmployee());
         
         this.processCAPResponse(response);
@@ -267,8 +274,6 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     public void actionSearchEmployeeById(int employeeId) {
         tDate = new Date();
         oLog = new CAPLogUI();
-        oLog.setTimeStamp(tDate);
-        showTimestamp(tDate);
         
         CAPResponse response = oCAPRequest.requestByIdEmployee(tDate, employeeId, oConfig.getSearchScheduleDays(), oConfig.getUrlIdEmployee());
         this.processCAPResponse(response);
@@ -299,6 +304,8 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         ImageIcon icon = CAPSiieDb.getPhoto(oSiieMySql.connectMySQL(), response.getEmployee().getExternal_id());
         oLog.setPhoto(icon);
         showPhoto(icon);
+        oLog.setTimeStamp(tDate);
+        showTimestamp(tDate);
         
         // se muestra la info del empleado
         this.showData(response.getEmployee().getNum_employee(), response.getEmployee().getName());
@@ -312,7 +319,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
             //si se niega el acceso se muestra el mensaje en pantalla y se escribe en la bitácora
             oLog.setAuthorized(false);
             lLog.add(0, oLog);
-            updateLog();
+            updateTableLog();
             oEnumSource = null;
             
             return;
@@ -322,7 +329,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         this.showAutorized(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch(), false);
         oLog.setAuthorized(true);
         lLog.add(0, oLog);
-        updateLog();
+        updateTableLog();
         oEnumSource = null;
     }
     
@@ -518,7 +525,7 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      * @param scheduleOut
      * @param isNext 
      */
-    private void showUnauthorized(String reason, String scheduleIn, String scheduleOut, boolean isNext, boolean fromLog) {
+    public void showUnauthorized(String reason, String scheduleIn, String scheduleOut, boolean isNext, boolean fromLog) {
         String text = "<html>"
                         + "<body style='text-align: center; background-color: red;'>"
                             + "<div style='height: 200px; width: 180px; top: 50%;'><br><br>ACCESO<br>DENEGADO</div>"
@@ -609,25 +616,23 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
      * Mostrar valor seleccionado de la bitácora.
      */
     private void actionShowLog() {
-        oLog = jlistLog.getSelectedValue();
+        int i = jTableLog.getSelectedRow();
+        oLog = this.lLog.get(i);
         showLog();
     }
     
     /**
      * Actualizar bitácora.
      */
-    private void updateLog() {
-        DefaultListModel model = new DefaultListModel();
+    private void updateTableLog() {
+        CAPLogUIModel model = (CAPLogUIModel) jTableLog.getModel();
         
         if (oConfig.getCountLog() < lLog.size()) {
             lLog.remove(lLog.size() - 1);
         }
         
-        for (CAPLogUI cAPLogUI : lLog) {
-            model.addElement(cAPLogUI);
-        }
-        
-        jlistLog.setModel(model);
+        model.setlModelLog(lLog);
+        model.fireTableDataChanged();
     }
     
     /**
@@ -759,8 +764,8 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
         jLabel3 = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
         jbShowLog = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jlistLog = new javax.swing.JList<>();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTableLog = new javax.swing.JTable();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -957,11 +962,15 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
 
         jPanel3.add(jPanel28);
 
-        jScrollPane1.setPreferredSize(new java.awt.Dimension(225, 520));
+        jScrollPane3.setPreferredSize(new java.awt.Dimension(225, 520));
 
-        jScrollPane1.setViewportView(jlistLog);
+        jTableLog.setModel(new CAPLogUIModel());
+        jTableLog.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jTableLog.setColumnSelectionAllowed(true);
+        jScrollPane3.setViewportView(jTableLog);
+        jTableLog.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        jPanel3.add(jScrollPane1);
+        jPanel3.add(jScrollPane3);
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(710, 0, 240, 589));
     }// </editor-fold>//GEN-END:initComponents
@@ -1019,7 +1028,8 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTable jTableLog;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton jbSearch;
     private javax.swing.JButton jbSearchByEmployee;
@@ -1032,7 +1042,6 @@ public class CAPMainUI extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jlResultMessage;
     private javax.swing.JLabel jlSearching;
     private javax.swing.JLabel jlTitle;
-    private javax.swing.JList<CAPLogUI> jlistLog;
     private javax.swing.JList<CAPEmployeeUI> jlistSearchEmployees;
     private javax.swing.JTextField jtfNameEmp;
     private javax.swing.JTextField jtfNumEmp;

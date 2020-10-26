@@ -142,6 +142,10 @@ public class CAPDigitalPersona {
                 oCapGui.setoEnumSource(CAPSource.HUELLA);
                 oCapGui.actionSearchEmployeeById(id);
             }
+            else {
+                oCapGui.resetFields();
+                oCapGui.showUnauthorized("No se reconocíó la huella", "", "", false, false);
+            }
             
         } catch (IOException ex) {
             Logger.getLogger(Checador.class.getName()).log(Level.SEVERE, null, ex);
