@@ -5,11 +5,10 @@
  */
 package capaccesscontrol;
 
-import capaccesscontrol.ui.CAPMainUI;
 import capaccesscontrol.config.CAPConfig;
 import capaccesscontrol.config.CAPConfigReader;
 import capaccesscontrol.core.CAPDigitalPersona;
-import capaccesscontrol.ui.CAPSource;
+import capaccesscontrol.ui.CAPScreen;
 import javax.swing.JFrame;
 
 /**
@@ -25,17 +24,27 @@ public class CAPAccessControl {
         // TODO code application logic here
         CAPConfigReader cr = new CAPConfigReader();
         CAPConfig config = cr.readConfig();
+//        
+//        CAPMainUI ui = new CAPMainUI(config);
+
+//        ui.setSize(960, 620);
+//        ui.setResizable(false);
+//        ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        ui.setLocationRelativeTo(null);
+//        
+//        CAPDigitalPersona obj = new CAPDigitalPersona(ui);
+//        
+//        ui.setVisible(true);
         
-        CAPMainUI ui = new CAPMainUI(config);
-        ui.setTitle("CAP Access Control - " + config.getCompanyData().getCompanyName());
-        ui.setSize(960, 620);
-        ui.setResizable(false);
-        ui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ui.setLocationRelativeTo(null);
+        CAPScreen ui2 = new CAPScreen(config);
+        ui2.setTitle("CAP Access Control - " + config.getCompanyData().getCompanyName());
+        ui2.setSize(1080, 620);
+        ui2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        ui2.setLocationRelativeTo(null);
         
-        CAPDigitalPersona obj = new CAPDigitalPersona(ui);
+        CAPDigitalPersona obj = new CAPDigitalPersona(ui2);
         
-        ui.setVisible(true);
+        ui2.setVisible(true);
     }
     
 }

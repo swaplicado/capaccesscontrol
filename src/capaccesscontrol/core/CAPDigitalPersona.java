@@ -8,6 +8,7 @@ package capaccesscontrol.core;
 import Formularios.Checador;
 import Formularios.envioCorreo;
 import capaccesscontrol.ui.CAPMainUI;
+import capaccesscontrol.ui.CAPScreen;
 import capaccesscontrol.ui.CAPSource;
 import com.digitalpersona.onetouch.DPFPDataPurpose;
 import com.digitalpersona.onetouch.DPFPFeatureSet;
@@ -43,9 +44,9 @@ public class CAPDigitalPersona {
     private DPFPFeatureSet featuresDP;
     
     private Checador oChecador;
-    private CAPMainUI oCapGui;
+    private CAPScreen oCapGui;
 
-    public CAPDigitalPersona(CAPMainUI ui) {
+    public CAPDigitalPersona(CAPScreen ui) {
         this.oCapGui = ui;
         oChecador = new Checador();
         this.startReaderMethods();
