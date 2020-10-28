@@ -37,6 +37,9 @@ import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 /**
  *
@@ -144,11 +147,31 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         
         lLog = new ArrayList();
         
+        jbSearchByEmployee.setEnabled(oConfig.isEnableSearchingByName());
         disableSearchByEmployee();
         
         if (oCAPRequest.login() == -1) {
             System.exit(-1);
         }
+        
+        String LAF = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+        try {
+            UIManager.setLookAndFeel(LAF);
+        }
+        catch (ClassNotFoundException ex) {
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (InstantiationException ex) {
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (IllegalAccessException ex) {
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        SwingUtilities.updateComponentTreeUI(this);
     }
     
     /**
@@ -536,14 +559,15 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         jlResultMessage.setText(text);
         jlResultMessage.setFont(new Font("Verdana", Font.PLAIN, 32));
         
-        String textReason = "<html>"
-                        + "<body style='text-align: center;'>"
-                            + "<div style='height: 100%; width: 100%;'><p>" + reason + "</p></div>"
-                        + "</body>"
-                    + "</html>";
+//        String textReason = "<html>"
+//                        + "<body style='text-align: center;'>"
+//                            + "<div style='height: 100%; width: 100%;'><p>" + reason + "</p></div>"
+//                        + "</body>"
+//                    + "</html>";
+        
+        String textReason = reason;
         
         jlReason.setText(textReason);
-        jlReason.setFont(new Font("Verdana", Font.PLAIN, 11));
         
         if (! isNext) {
             jlIn.setText("Horario entrada:");
@@ -583,7 +607,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
     private void showAutorized(String scheduleIn, String scheduleOut, boolean fromLog) {
         String text = "<html>"
                         + "<body style='text-align: center; background-color: green;'>"
-                            + "<div style='height: 200px; width: 180px; top: 50%;'><br><br>ACCESO<br>AUTORIZADO</div>"
+                            + "<div style='height: 180px; width: 250px; top: 50%;'><br><br>ACCESO<br>AUTORIZADO</div>"
                         + "</body>"
                     + "</html>";
         
@@ -726,12 +750,9 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         jLabel5 = new javax.swing.JLabel();
         jtfNumEmployee = new javax.swing.JTextField();
         jbSearch = new javax.swing.JButton();
-        jPanel31 = new javax.swing.JPanel();
-        jLabel4 = new javax.swing.JLabel();
-        jbSearchByEmployee = new javax.swing.JButton();
         jPanel9 = new javax.swing.JPanel();
         jPanel25 = new javax.swing.JPanel();
-        jLabel8 = new javax.swing.JLabel();
+        jbSearchByEmployee = new javax.swing.JButton();
         jPanel26 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jtfSearchEmployee = new javax.swing.JTextField();
@@ -745,6 +766,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         jPanel10 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jlImgPhoto = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         jPanel20 = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
         jtfNumEmp = new javax.swing.JTextField();
@@ -760,15 +782,16 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         jtfScheduleOut = new javax.swing.JTextField();
         jPanel11 = new javax.swing.JPanel();
         jPanel22 = new javax.swing.JPanel();
-        jlReason = new javax.swing.JLabel();
+        jlReason = new javax.swing.JTextField();
         jPanel23 = new javax.swing.JPanel();
         jlResultMessage = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
         jPanel28 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
         jbShowLog = new javax.swing.JButton();
-        jScrollPane3 = new javax.swing.JScrollPane();
+        jPanel31 = new javax.swing.JPanel();
+        jScrollPanel = new javax.swing.JScrollPane();
         jTableLog = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -802,13 +825,16 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
 
         jPanel8.add(jPanel15);
 
-        jLabel2.setText("Consulte Empleado");
+        jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Consulte empleado");
         jLabel2.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel16.add(jLabel2);
 
         jPanel8.add(jPanel16);
 
-        jLabel5.setText("Num. Empleado:");
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel5.setText("Por número");
         jLabel5.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel17.add(jLabel5);
 
@@ -825,23 +851,17 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
 
         jPanel8.add(jPanel17);
 
-        jLabel4.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel31.add(jLabel4);
-
-        jbSearchByEmployee.setText("Búsqueda por nombre");
-        jPanel31.add(jbSearchByEmployee);
-
-        jPanel8.add(jPanel31);
-
         jPanel6.add(jPanel8);
 
-        jLabel8.setText("Búsqueda de empleado");
-        jLabel8.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel25.add(jLabel8);
+        jPanel9.setBorder(javax.swing.BorderFactory.createTitledBorder("Búsqueda por empleado"));
+
+        jbSearchByEmployee.setText("Búsqueda por nombre");
+        jPanel25.add(jbSearchByEmployee);
 
         jPanel9.add(jPanel25);
 
-        jLabel9.setText("Nombre:");
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel9.setText("Por nombre:");
         jLabel9.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel26.add(jLabel9);
 
@@ -878,7 +898,9 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
 
         jPanel7.setLayout(new java.awt.GridLayout(2, 1));
 
-        jLabel1.setPreferredSize(new java.awt.Dimension(110, 23));
+        jPanel10.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del empleado"));
+
+        jLabel1.setPreferredSize(new java.awt.Dimension(75, 23));
         jPanel10.add(jLabel1);
 
         jlImgPhoto.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -888,28 +910,32 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         jlImgPhoto.setPreferredSize(new java.awt.Dimension(100, 100));
         jPanel10.add(jlImgPhoto);
 
+        jLabel6.setPreferredSize(new java.awt.Dimension(75, 23));
+        jPanel10.add(jLabel6);
+
         jPanel20.setLayout(new java.awt.GridLayout(5, 1));
 
         jtfNumEmp.setEditable(false);
         jtfNumEmp.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jtfNumEmp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfNumEmp.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel18.add(jtfNumEmp);
 
         jPanel20.add(jPanel18);
 
         jtfNameEmp.setEditable(false);
-        jtfNameEmp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfNameEmp.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel19.add(jtfNameEmp);
 
         jPanel20.add(jPanel19);
 
         jtfTimestamp.setEditable(false);
         jtfTimestamp.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jtfTimestamp.setPreferredSize(new java.awt.Dimension(200, 23));
+        jtfTimestamp.setPreferredSize(new java.awt.Dimension(250, 23));
         jPanel30.add(jtfTimestamp);
 
         jPanel20.add(jPanel30);
 
+        jlIn.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jlIn.setText("Entrada");
         jlIn.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel21.add(jlIn);
@@ -921,6 +947,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
 
         jPanel20.add(jPanel21);
 
+        jlOut.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jlOut.setText("Salida");
         jlOut.setPreferredSize(new java.awt.Dimension(100, 23));
         jPanel24.add(jlOut);
@@ -936,6 +963,10 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
 
         jPanel7.add(jPanel10);
 
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder("Resultado"));
+
+        jlReason.setEditable(false);
+        jlReason.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jPanel22.add(jlReason);
 
         jPanel11.add(jPanel22);
@@ -952,22 +983,32 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
 
         jPanel5.setLayout(new java.awt.BorderLayout());
 
-        jLabel3.setPreferredSize(new java.awt.Dimension(150, 23));
-        jPanel12.add(jLabel3);
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Bitácora"));
+        jPanel12.setLayout(new java.awt.BorderLayout());
+
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel3.setPreferredSize(new java.awt.Dimension(250, 23));
+        jPanel28.add(jLabel3);
 
         jbShowLog.setText("Ver");
         jPanel28.add(jbShowLog);
 
-        jPanel12.add(jPanel28);
+        jPanel12.add(jPanel28, java.awt.BorderLayout.CENTER);
 
-        jScrollPane3.setPreferredSize(new java.awt.Dimension(225, 520));
+        jPanel31.setLayout(new java.awt.BorderLayout());
+
+        jScrollPanel.setAutoscrolls(true);
+        jScrollPanel.setColumnHeader(null);
 
         jTableLog.setModel(new CAPLogUIModel());
         jTableLog.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jTableLog.setColumnSelectionAllowed(true);
-        jScrollPane3.setViewportView(jTableLog);
+        jTableLog.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jScrollPanel.setViewportView(jTableLog);
+        jTableLog.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        jPanel12.add(jScrollPane3);
+        jPanel31.add(jScrollPanel, java.awt.BorderLayout.CENTER);
+
+        jPanel12.add(jPanel31, java.awt.BorderLayout.PAGE_START);
 
         jPanel5.add(jPanel12, java.awt.BorderLayout.CENTER);
 
@@ -998,9 +1039,8 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
@@ -1034,7 +1074,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPanel;
     private javax.swing.JTable jTableLog;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JButton jbSearch;
@@ -1044,7 +1084,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jlImgPhoto;
     private javax.swing.JLabel jlIn;
     private javax.swing.JLabel jlOut;
-    private javax.swing.JLabel jlReason;
+    private javax.swing.JTextField jlReason;
     private javax.swing.JLabel jlResultMessage;
     private javax.swing.JLabel jlTitle;
     private javax.swing.JList<CAPEmployeeUI> jlistSearchEmployees;

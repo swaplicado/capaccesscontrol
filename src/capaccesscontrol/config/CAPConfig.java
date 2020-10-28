@@ -14,6 +14,7 @@ public class CAPConfig {
     protected int searchScheduleDays;
     protected int minPrevSchedule;
     protected int minPostSchedule;
+    protected boolean enableSearchingByName;
     protected String mailCAP;
     protected String pswdCAP;
     protected String urlLogin;
@@ -54,6 +55,14 @@ public class CAPConfig {
 
     public void setMinPostSchedule(int minPostSchedule) {
         this.minPostSchedule = minPostSchedule;
+    }
+
+    public boolean isEnableSearchingByName() {
+        return enableSearchingByName;
+    }
+
+    public void setEnableSearchingByName(boolean enableSearchingByName) {
+        this.enableSearchingByName = enableSearchingByName;
     }
 
     public String getMailCAP() {
