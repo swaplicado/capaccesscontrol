@@ -6,12 +6,9 @@
 package capaccesscontrol.ui;
 
 import capaccesscontrol.config.CAPConfig;
-import capaccesscontrol.core.CAPCore;
 import capaccesscontrol.db.CAPMySql;
 import capaccesscontrol.db.CAPSiieDb;
-import capaccesscontrol.packet.CAPAbsenceResponse;
 import capaccesscontrol.packet.CAPEmployeeResponse;
-import capaccesscontrol.packet.CAPEventResponse;
 import capaccesscontrol.packet.CAPRequest;
 import capaccesscontrol.packet.CAPResponse;
 import java.awt.Font;
@@ -259,7 +256,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         
         oLog = new CAPLogUI();
         this.oEnumSource = CAPSource.CODIGO;
-        CAPResponse response = oCAPRequest.requestByNumEmployee(tDate, numEmp, oConfig.getSearchScheduleDays(), oConfig.getUrlNumEmployee());
+        CAPResponse response = oCAPRequest.requestByNumEmployee(tDate, numEmp, oConfig.getSearchScheduleDays(), oConfig.getMinPrevSchedule(), oConfig.getMinPostSchedule(), oConfig.getUrlNumEmployee());
         
         this.processCAPResponse(response);
     }
@@ -298,7 +295,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         tDate = new Date();
         oLog = new CAPLogUI();
         
-        CAPResponse response = oCAPRequest.requestByIdEmployee(tDate, employeeId, oConfig.getSearchScheduleDays(), oConfig.getUrlIdEmployee());
+        CAPResponse response = oCAPRequest.requestByIdEmployee(tDate, employeeId, oConfig.getSearchScheduleDays(), oConfig.getMinPrevSchedule(), oConfig.getMinPostSchedule(), oConfig.getUrlIdEmployee());
         this.processCAPResponse(response);
         
         DefaultListModel model = new DefaultListModel();
@@ -338,22 +335,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         oLog.setSource(oEnumSource);
         
         // se valida el acceso mediante la respuesta del servidor
-        if (! validateAccess(response)) {
-            //si se niega el acceso se muestra el mensaje en pantalla y se escribe en la bitácora
-            oLog.setAuthorized(false);
-            lLog.add(0, oLog);
-            updateTableLog();
-            oEnumSource = null;
-            
-            return;
-        }
-        
-        // si el acceso al empleado es permitido se muestra la autorización y se escribe el suceso en la biácora
-        this.showAutorized(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch(), false);
-        oLog.setAuthorized(true);
-        lLog.add(0, oLog);
-        updateTableLog();
-        oEnumSource = null;
+        validateAccess(response);
     }
     
     /**
@@ -469,75 +451,38 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
             return false;
         }
         
-        String sIn = "";
-        String sOut = "";
-        
-        // Si el empleado tiene eventos programados
-        if (response.getEvents() != null && response.getEvents().size() > 0) {
-            String reason = "";
-            for (CAPEventResponse event : response.getEvents()) {
-                reason = reason.isEmpty() ? event.getTypeName() : (reason + ", " + event.getTypeName());
-            }
-            
-            if (response.getNextSchedule() != null) {
-                sIn = response.getNextSchedule().getInDateTimeSch();
-                sOut = response.getNextSchedule().getOutDateTimeSch();
-            }
-            String reasons = "El empleado tiene programado: " + reason + " para el día de hoy";
-            showUnauthorized(reasons, sIn, sOut, true, false);
-            oLog.setReasons(reasons);
-            
-            return false;
-        }
-        
-        // Si el empleado tiene incidencias programadas
-        if (response.getAbsences() != null && response.getAbsences().size() > 0) {
-            String reason = "";
-            for (CAPAbsenceResponse abs : response.getAbsences()) {
-                reason = reason.isEmpty() ? abs.getType_name() : (reason + ", " + abs.getType_name());
-            }
-            
-            if (response.getNextSchedule() != null) {
-                sIn = response.getNextSchedule().getInDateTimeSch();
-                sOut = response.getNextSchedule().getOutDateTimeSch();
-            }
-            
-            String reasons = "El empleado tiene incidencias: " + reason + " para el día de hoy";
-            showUnauthorized(reasons, sIn, sOut, true, false);
-            oLog.setReasons(reasons);
-            
-            return false;
-        }
-        
-        // si el empleado tiene un horario
-        if (response.getSchedule() != null) {
-            // Si el empleado está o no en su horario
-            if (! CAPCore.isOnShift(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch(), tDate, oConfig.getMinPrevSchedule(), oConfig.getMinPostSchedule())) {
-                sIn = response.getSchedule().getInDateTimeSch();
-                sOut = response.getSchedule().getOutDateTimeSch();
-                
-                String reasons = "El empleado está fuera de su horario";
-                showUnauthorized(reasons, sIn, sOut, false, false);
-                oLog.setReasons(reasons);
-                
-                return false;
-            }
-            else {
-                return true;
-            }
+        if (response.isAuthorized()) {
+            // si el acceso al empleado es permitido se muestra la autorización y se escribe el suceso en la biácora
+            this.showAutorized(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch(), false);
+            oLog.setReasons(response.getMessage());
+            oLog.setAuthorized(true);
         }
         else {
-            if (response.getNextSchedule() != null) {
-                sIn = response.getNextSchedule().getInDateTimeSch();
-                sOut = response.getNextSchedule().getOutDateTimeSch();
+            String sIn = "";
+            String sOut = "";
+            boolean isNext = false;
+            if (response.getSchedule() != null) {
+                isNext = false;
+                sIn = response.getSchedule().getInDateTimeSch();
+                sOut = response.getSchedule().getOutDateTimeSch();
+            }
+            else {
+                if (response.getNextSchedule() != null) {
+                    sIn = response.getNextSchedule().getInDateTimeSch();
+                    sOut = response.getNextSchedule().getOutDateTimeSch();
+                }
             }
             
-            String reasons = "El empleado no tiene horario asignado para el día de hoy";
-            showUnauthorized(reasons, sIn, sOut, true, false);
-            oLog.setReasons(reasons);
-            
-            return false;
+            showUnauthorized(response.getMessage(), sIn, sOut, isNext, false);
+            oLog.setReasons(response.getMessage());
+            oLog.setAuthorized(false);
         }
+        
+        lLog.add(0, oLog);
+        updateTableLog();
+        oEnumSource = null;
+        
+        return response.isAuthorized();
     }
     
     /**
@@ -694,7 +639,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
             
             return format1.format(date1);
         } catch (ParseException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
         
         return "";

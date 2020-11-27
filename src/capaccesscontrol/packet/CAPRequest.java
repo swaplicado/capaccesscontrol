@@ -5,7 +5,7 @@
  */
 package capaccesscontrol.packet;
 
-import capaccesscontrol.ui.CAPMainUI;
+import capaccesscontrol.ui.CAPScreen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,10 +69,12 @@ public class CAPRequest {
      * @param dtDate
      * @param idEmployee
      * @param nextDays
+     * @param minsIn
+     * @param minsOut
      * @param url
      * @return 
      */
-    public CAPResponse requestByIdEmployee(Date dtDate, int idEmployee, int nextDays, String url) {
+    public CAPResponse requestByIdEmployee(Date dtDate, int idEmployee, int nextDays, int minsIn, int minsOut, String url) {
         CAPResponse response = null;
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -83,11 +85,13 @@ public class CAPRequest {
             String sDate = df.format(dtDate);
             String sTime = tf.format(dtDate);
             
-            String query = String.format("dt_date=%s&dt_time=%s&id_emp=%s&next_days=%s",
+            String query = String.format("dt_date=%s&dt_time=%s&id_emp=%s&next_days=%s&mins_in=%s&mins_out=%s",
                     URLEncoder.encode(sDate, charset),
                     URLEncoder.encode(sTime, charset),
                     URLEncoder.encode(idEmployee + "", charset),
-                    URLEncoder.encode(nextDays + "", charset)
+                    URLEncoder.encode(nextDays + "", charset),
+                    URLEncoder.encode(minsIn + "", charset),
+                    URLEncoder.encode(minsOut + "", charset)
             );
             
             response = this.request(url, query);
@@ -105,10 +109,12 @@ public class CAPRequest {
      * @param dtDate
      * @param numEmployee
      * @param nextDays
+     * @param minsIn
+     * @param minsOut
      * @param url
      * @return 
      */
-    public CAPResponse requestByNumEmployee(Date dtDate, String numEmployee, int nextDays, String url) {
+    public CAPResponse requestByNumEmployee(Date dtDate, String numEmployee, int nextDays, int minsIn, int minsOut, String url) {
         CAPResponse response = null;
         try {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -119,11 +125,13 @@ public class CAPRequest {
             String sDate = df.format(dtDate);
             String sTime = tf.format(dtDate);
             
-            String query = String.format("dt_date=%s&dt_time=%s&num_emp=%s&next_days=%s",
+            String query = String.format("dt_date=%s&dt_time=%s&num_emp=%s&next_days=%s&mins_in=%s&mins_out=%s",
                     URLEncoder.encode(sDate, charset),
                     URLEncoder.encode(sTime, charset),
                     URLEncoder.encode(numEmployee, charset),
-                    URLEncoder.encode(nextDays + "", charset)
+                    URLEncoder.encode(nextDays + "", charset),
+                    URLEncoder.encode(minsIn + "", charset),
+                    URLEncoder.encode(minsOut + "", charset)
             );
             
             response = this.request(url, query);
@@ -172,20 +180,20 @@ public class CAPRequest {
             }
         }
         catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (MalformedURLException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch(com.fasterxml.jackson.core.JsonParseException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
             
             if (this.login() == 200) {
                 return this.request(sURL, query);
             }
         }
         catch (IOException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
             if (this.login() == 200) {
                 return this.request(sURL, query);
             }
@@ -227,13 +235,13 @@ public class CAPRequest {
             }
         }
         catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (MalformedURLException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex);
         }
         catch (IOException ex) {
-            Logger.getLogger(CAPMainUI.class.getName()).log(Level.SEVERE, null, ex.getMessage());
+            Logger.getLogger(CAPScreen.class.getName()).log(Level.SEVERE, null, ex.getMessage());
             
             if (ex.getMessage().equals("Connection refused: connect")) {
                 JOptionPane.showMessageDialog(null, "No hay conexión con el servidor", "Error", JOptionPane.ERROR_MESSAGE);

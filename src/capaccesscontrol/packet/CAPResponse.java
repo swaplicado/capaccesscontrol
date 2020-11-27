@@ -18,6 +18,8 @@ public class CAPResponse {
     protected List<CAPEventResponse> events;
     protected CAPSchedule schedule;
     protected CAPSchedule nextSchedule;
+    protected boolean authorized;
+    protected String message;
 
     public CAPEmployeeResponse getEmployee() {
         return employee;
@@ -66,5 +68,20 @@ public class CAPResponse {
     public void setNextSchedule(CAPSchedule nextSchedule) {
         this.nextSchedule = nextSchedule;
     }
+
+    public boolean isAuthorized() {
+        return authorized;
+    }
+
+    public void setAuthorized(boolean authorized) {
+        this.authorized = authorized;
+    }
     
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

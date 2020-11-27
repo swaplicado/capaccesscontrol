@@ -7,7 +7,6 @@ package capaccesscontrol.core;
 
 import Formularios.Checador;
 import Formularios.envioCorreo;
-import capaccesscontrol.ui.CAPMainUI;
 import capaccesscontrol.ui.CAPScreen;
 import capaccesscontrol.ui.CAPSource;
 import com.digitalpersona.onetouch.DPFPDataPurpose;
