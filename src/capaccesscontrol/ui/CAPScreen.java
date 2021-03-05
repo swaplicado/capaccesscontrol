@@ -11,6 +11,7 @@ import capaccesscontrol.db.CAPSiieDb;
 import capaccesscontrol.packet.CAPEmployeeResponse;
 import capaccesscontrol.packet.CAPRequest;
 import capaccesscontrol.packet.CAPResponse;
+import capaccesscontrol.packet.CAPhilo;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -18,6 +19,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,6 +61,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
     private CAPLogUI oLog;
     private CAPSource oEnumSource;
     private CAPLogUIModel oModel;
+    private boolean autorization;
 
     /**
      * Creates new form CAPScreen
@@ -64,6 +71,7 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         this.oConfig = cfg;
         initComponents();
         initCustom();
+        autorization = false;
     }
     
     /**
@@ -335,7 +343,8 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         oLog.setSource(oEnumSource);
         
         // se valida el acceso mediante la respuesta del servidor
-        validateAccess(response);
+        boolean respuesta = validateAccess(response);
+        
     }
     
     /**
@@ -580,6 +589,9 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         
         jtfScheduleIn.setText(schIn);
         jtfScheduleOut.setText(schOut);
+        
+        CAPhilo hilo = new CAPhilo();
+        hilo.start();
     }
     
     /**
