@@ -344,7 +344,6 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
         
         // se valida el acceso mediante la respuesta del servidor
         boolean respuesta = validateAccess(response);
-        
     }
     
     /**
@@ -452,14 +451,6 @@ public class CAPScreen extends javax.swing.JFrame implements ActionListener {
      * @return 
      */
     private boolean validateAccess(CAPResponse response) {
-        if (! response.getEmployee().isIs_active() || response.getEmployee().isIs_delete()) {
-            String reason = "El empleado está desactivado en el sistema";
-            showUnauthorized(reason, "", "", false, false);
-            oLog.setReasons(reason);
-            
-            return false;
-        }
-        
         if (response.isAuthorized()) {
             // si el acceso al empleado es permitido se muestra la autorización y se escribe el suceso en la biácora
             this.showAutorized(response.getSchedule().getInDateTimeSch(), response.getSchedule().getOutDateTimeSch(), false);
