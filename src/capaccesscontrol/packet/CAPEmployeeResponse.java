@@ -5,10 +5,13 @@
  */
 package capaccesscontrol.packet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  *
  * @author Edwin Carmona
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CAPEmployeeResponse {
     protected int id;
     protected String name;
@@ -64,6 +67,5 @@ public class CAPEmployeeResponse {
     public void setIs_delete(boolean is_delete) {
         this.is_delete = is_delete;
     }
-    
     
 }

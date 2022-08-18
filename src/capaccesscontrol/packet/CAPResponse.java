@@ -5,12 +5,14 @@
  */
 package capaccesscontrol.packet;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 /**
  *
  * @author Edwin Carmona
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CAPResponse {
     protected CAPEmployeeResponse employee;
     protected List<CAPEmployeeResponse> employees;
