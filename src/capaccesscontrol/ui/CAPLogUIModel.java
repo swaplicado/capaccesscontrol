@@ -25,11 +25,15 @@ public class CAPLogUIModel extends AbstractTableModel  {
 
     private SimpleDateFormat format;
     
-    private String[] columnNames = {"Fecha/hora", 
-                                    "Acceso",
-                                    "Número",
-                                    "Nombre",
-                                    "Origen"};
+    private String[] columnNames = {
+                                        "Fecha/hora", 
+                                        "Acceso",
+                                        "Número",
+                                        "Nombre",
+                                        "Puesto",
+                                        "Departamento",
+                                        "Origen"
+                                    };
     
     private List<CAPLogUI> lModelLog;
 
@@ -85,6 +89,12 @@ public class CAPLogUIModel extends AbstractTableModel  {
                 value = logRow.getNameEmployee();
                 break;
             case 4:
+                value = logRow.getNameEmpJob();
+                break;
+            case 5:
+                value = logRow.getNameEmpDept();
+                break;
+            case 6:
                 value = logRow.getSource().toString();
                 break;
         }

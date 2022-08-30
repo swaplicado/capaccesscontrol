@@ -7,7 +7,7 @@ package capaccesscontrol.core;
 
 import Formularios.Checador;
 import Formularios.envioCorreo;
-import capaccesscontrol.ui.CAPScreen;
+import capaccesscontrol.ui.CAPScreenNV;
 import capaccesscontrol.ui.CAPSource;
 import com.digitalpersona.onetouch.DPFPDataPurpose;
 import com.digitalpersona.onetouch.DPFPFeatureSet;
@@ -43,9 +43,9 @@ public class CAPDigitalPersona {
     private DPFPFeatureSet featuresDP;
     
     private Checador oChecador;
-    private CAPScreen oCapGui;
+    private CAPScreenNV oCapGui;
 
-    public CAPDigitalPersona(CAPScreen ui) {
+    public CAPDigitalPersona(CAPScreenNV ui) {
         this.oCapGui = ui;
         oChecador = new Checador();
         this.startReaderMethods();
@@ -143,8 +143,9 @@ public class CAPDigitalPersona {
                 oCapGui.actionSearchEmployeeById(id);
             }
             else {
-                oCapGui.resetFields();
-                oCapGui.showUnauthorized("No se reconocíó la huella", "", "", false, false);
+//                oCapGui.resetFields();
+//                oCapGui.showUnauthorized("No se reconocíó la huella", "", "", false, false);
+                oCapGui.showNotFound();
             }
             
         } catch (IOException ex) {

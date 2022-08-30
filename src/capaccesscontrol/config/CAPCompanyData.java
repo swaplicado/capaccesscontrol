@@ -12,6 +12,7 @@ package capaccesscontrol.config;
 public class CAPCompanyData {
     protected String companyName;
     protected String companyImage;
+    protected String welcomeImage;
 
     public String getCompanyName() {
         return companyName;
@@ -28,6 +29,12 @@ public class CAPCompanyData {
     public void setCompanyImage(String companyImage) {
         this.companyImage = companyImage;
     }
-    
-    
+
+    public String getWelcomeImage() {
+        return welcomeImage;
+    }
+
+    public void setWelcomeImage(String welcomeImage) {
+        this.welcomeImage = welcomeImage;
+    }
 }

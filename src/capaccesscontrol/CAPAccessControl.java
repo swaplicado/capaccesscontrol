@@ -9,6 +9,7 @@ import capaccesscontrol.config.CAPConfig;
 import capaccesscontrol.config.CAPConfigReader;
 import capaccesscontrol.core.CAPDigitalPersona;
 import capaccesscontrol.ui.CAPScreen;
+import capaccesscontrol.ui.CAPScreenNV;
 import javax.swing.JFrame;
 
 /**
@@ -36,9 +37,19 @@ public class CAPAccessControl {
 //        
 //        ui.setVisible(true);
         
-        CAPScreen ui2 = new CAPScreen(config);
+//        CAPScreen ui2 = new CAPScreen(config);
+//        ui2.setTitle("CAP Access Control - " + config.getCompanyData().getCompanyName());
+//        ui2.setSize(1080, 620);
+//        ui2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//        ui2.setLocationRelativeTo(null);
+//        
+//        CAPDigitalPersona obj = new CAPDigitalPersona(ui2);
+//        
+//        ui2.setVisible(true);
+        
+        CAPScreenNV ui2 = new CAPScreenNV(config);
         ui2.setTitle("CAP Access Control - " + config.getCompanyData().getCompanyName());
-        ui2.setSize(1080, 620);
+        ui2.setSize(1080, 720);
         ui2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ui2.setLocationRelativeTo(null);
         

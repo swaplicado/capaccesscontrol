@@ -20,6 +20,8 @@ public class CAPLogUI {
     
     private String numEmployee;
     private String nameEmployee;
+    private String nameEmpJob;
+    private String nameEmpDept;
     private Date timeStamp;
     private ImageIcon photo;
     private boolean authorized;
@@ -40,6 +42,22 @@ public class CAPLogUI {
 
     public void setNameEmployee(String nameEmployee) {
         this.nameEmployee = nameEmployee;
+    }
+
+    public String getNameEmpJob() {
+        return nameEmpJob;
+    }
+
+    public void setNameEmpJob(String nameEmpJob) {
+        this.nameEmpJob = nameEmpJob;
+    }
+
+    public String getNameEmpDept() {
+        return nameEmpDept;
+    }
+
+    public void setNameEmpDept(String nameEmpDept) {
+        this.nameEmpDept = nameEmpDept;
     }
 
     public Date getTimeStamp() {
@@ -86,6 +104,8 @@ public class CAPLogUI {
         return new String[] {
             this.numEmployee,
             this.nameEmployee,
+            this.nameEmpJob,
+            this.nameEmpDept,
             format.format(this.timeStamp),
             this.authorized ? "AUTORIZADO" : "DENEGADO",
             this.source.toString()
