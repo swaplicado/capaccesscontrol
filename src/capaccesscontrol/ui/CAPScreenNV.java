@@ -599,6 +599,7 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
         jPanel11 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jPanel18 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
         moTextTimestamp = new sa.lib.gui.bean.SBeanFieldText();
         jPanel19 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
@@ -635,9 +636,10 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
         jPanel7.setLayout(new java.awt.GridLayout(1, 1));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel1.setText("Consulte empleado:");
+        jLabel1.setText("Registro acceso:");
         jPanel9.add(jLabel1);
 
+        moTextSearchNum.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         moTextSearchNum.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         moTextSearchNum.setPreferredSize(new java.awt.Dimension(150, 23));
         moTextSearchNum.addKeyListener(new java.awt.event.KeyAdapter() {
@@ -649,6 +651,7 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
 
         jbSearch.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jbSearch.setText("Buscar");
+        jbSearch.setPreferredSize(new java.awt.Dimension(125, 25));
         jPanel9.add(jbSearch);
 
         jPanel7.add(jPanel9);
@@ -698,6 +701,7 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
 
         jbShowLog.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jbShowLog.setText("Ver bitácora");
+        jbShowLog.setPreferredSize(new java.awt.Dimension(125, 25));
         jPphoto.add(jbShowLog, java.awt.BorderLayout.PAGE_END);
 
         jPAccess.add(jPphoto);
@@ -722,6 +726,12 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
 
         jPanel14.setLayout(new java.awt.GridLayout(6, 1));
 
+        jPanel18.setToolTipText("Fecha-hora de registro");
+
+        jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel2.setText("Fecha-hora registro");
+        jPanel18.add(jLabel2);
+
         moTextTimestamp.setEditable(false);
         moTextTimestamp.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         moTextTimestamp.setText("23/08/2022 09:20 am");
@@ -731,65 +741,93 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
 
         jPanel14.add(jPanel18);
 
+        jPanel19.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel5.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jLabel5.setText("Nombre:");
+        jLabel5.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel19.add(jLabel5);
 
         moTextNameEmp.setEditable(false);
-        moTextNameEmp.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
+        moTextNameEmp.setBorder(null);
+        moTextNameEmp.setFont(new java.awt.Font("Tahoma", 1, 20)); // NOI18N
         moTextNameEmp.setPreferredSize(new java.awt.Dimension(500, 30));
         jPanel19.add(moTextNameEmp);
 
         jPanel14.add(jPanel19);
 
-        jLabel9.setText("Número de empleado:");
+        jPanel20.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel9.setText("Número empleado:");
+        jLabel9.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel20.add(jLabel9);
 
         moTextNumEmp.setEditable(false);
         moTextNumEmp.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        moTextNumEmp.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        moTextNumEmp.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         jPanel20.add(moTextNumEmp);
 
+        jlJob.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jlJob.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         jlJob.setText("Puesto:");
+        jlJob.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel20.add(jlJob);
 
         moTextJob.setEditable(false);
-        moTextJob.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        moTextJob.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         moTextJob.setPreferredSize(new java.awt.Dimension(300, 23));
         jPanel20.add(moTextJob);
 
         jPanel14.add(jPanel20);
 
-        jLabel8.setText("Departamento");
+        jPanel22.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jLabel8.setText("Departamento:");
+        jLabel8.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel22.add(jLabel8);
 
         moTextDepartment.setEditable(false);
-        moTextDepartment.setFont(new java.awt.Font("Tahoma", 0, 16)); // NOI18N
+        moTextDepartment.setBorder(null);
+        moTextDepartment.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         moTextDepartment.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel22.add(moTextDepartment);
 
         jPanel14.add(jPanel22);
 
-        jlIn.setText("Entrada:");
+        jPanel21.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
+        jlIn.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jlIn.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jlIn.setText("Horario entrada:");
+        jlIn.setPreferredSize(new java.awt.Dimension(120, 23));
         jPanel21.add(jlIn);
 
         moTextScheduleIn.setEditable(false);
         moTextScheduleIn.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        moTextScheduleIn.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        moTextScheduleIn.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         moTextScheduleIn.setPreferredSize(new java.awt.Dimension(200, 30));
         jPanel21.add(moTextScheduleIn);
 
-        jlOut.setText("Salida:");
+        jlOut.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jlOut.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        jlOut.setText("Horario salida:");
+        jlOut.setPreferredSize(new java.awt.Dimension(90, 23));
         jPanel21.add(jlOut);
 
         moTextScheduleOut.setEditable(false);
         moTextScheduleOut.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        moTextScheduleOut.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
+        moTextScheduleOut.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         moTextScheduleOut.setPreferredSize(new java.awt.Dimension(200, 30));
         jPanel21.add(moTextScheduleOut);
 
         jPanel14.add(jPanel21);
 
-        jlReason.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jlReason.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
         jlReason.setForeground(new java.awt.Color(204, 0, 0));
         jlReason.setPreferredSize(new java.awt.Dimension(500, 23));
         jPanel10.add(jlReason);
@@ -813,7 +851,9 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
         jlWelcomeImg.setPreferredSize(new java.awt.Dimension(500, 300));
         jPWelcome.add(jlWelcomeImg, java.awt.BorderLayout.CENTER);
 
+        jbShowLog2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jbShowLog2.setText("Ver bitácora");
+        jbShowLog2.setPreferredSize(new java.awt.Dimension(125, 25));
         jPanel2.add(jbShowLog2);
 
         jPWelcome.add(jPanel2, java.awt.BorderLayout.PAGE_END);
@@ -840,6 +880,7 @@ public class CAPScreenNV extends javax.swing.JFrame implements ActionListener {
     private javax.swing.JLabel jLImage;
     private javax.swing.JLabel jLWelcome;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel8;
