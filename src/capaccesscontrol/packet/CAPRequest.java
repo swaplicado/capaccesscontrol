@@ -214,7 +214,7 @@ public class CAPRequest {
             connection.setRequestProperty("Accept", "application/json");
             connection.setDoOutput(true);
 
-            String jsonInputString = "{ \"email\": \"" + this.usrCAP + "\",\"password\": \"" + this.pswdCAP + "\" }";
+            String jsonInputString = "{ \"name\": \"" + this.usrCAP + "\",\"password\": \"" + this.pswdCAP + "\" }";
 
             try(OutputStream os = connection.getOutputStream()) {
                 byte[] input = jsonInputString.getBytes("utf-8");

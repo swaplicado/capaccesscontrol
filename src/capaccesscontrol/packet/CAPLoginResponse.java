@@ -10,10 +10,19 @@ package capaccesscontrol.packet;
  * @author Edwin Carmona
  */
 class CAPLoginResponse {
+    private String status;
     private String access_token;
     private String token_type;
     private String expires_at;
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
     public String getAccess_token() {
         return access_token;
     }

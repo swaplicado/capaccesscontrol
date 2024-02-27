@@ -23,6 +23,7 @@ import com.digitalpersona.onetouch.capture.event.DPFPReaderStatusAdapter;
 import com.digitalpersona.onetouch.capture.event.DPFPReaderStatusEvent;
 import com.digitalpersona.onetouch.verification.DPFPVerification;
 import com.digitalpersona.onetouch.verification.DPFPVerificationResult;
+import core.EmployeeData;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -168,10 +169,13 @@ public class CAPDigitalPersona {
         //PreparedStatement identificarStmt = c.prepareStatement("SELECT id,employee_id,print FROM fingerprints");
         //ResultSet rs = identificarStmt.executeQuery();
         //Si se encuentra el nombre en la base de datos
-        for (int index = 0; oChecador.getHuellas().size() > index; index++) {
+        for (EmployeeData oEmp : oChecador.getEmployeeDataList()) {
             //Lee la plantilla de la base de datos
             //byte templateBuffer[] = rs.getBytes("print");
-            byte templateBuffer[] = oChecador.getHuellas().get(index);
+            if (oEmp.getFingerprint() == null) {
+                continue;
+            }
+            byte templateBuffer[] = oEmp.getFingerprint();
             //Crea una nueva plantilla a partir de la guardada en la base de datos
             DPFPTemplate referenceTemplate = DPFPGlobal.getTemplateFactory().createTemplate(templateBuffer);
             //Compara las caracteristicas de la huella recientemente capturada con alguna plantilla guardada en la base de datos que concide con ese tipo
@@ -179,7 +183,7 @@ public class CAPDigitalPersona {
             //Compara las plantillas, si encuentra correspondenica dibuja el mapa que indica el nombre de la persona que coincidio
             if (result.isVerified()) {
                  //int employee_id = rs.getInt("employee_id");
-                return oChecador.getListaempleados().get(index);
+                return oEmp.getIdEmployee();
             }
         }
         

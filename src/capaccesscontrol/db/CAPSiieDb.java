@@ -41,9 +41,14 @@ public class CAPSiieDb {
                 
                 return CAPSiieDb.convertBlobToImageIcon(blob);
             }
-        } catch (SQLException ex) {
+            
+            image = new javax.swing.ImageIcon("img/userprof.png");
+            return image;
+        }
+        catch (SQLException ex) {
             Logger.getLogger(CAPSiieDb.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        }
+        catch (IOException ex) {
             Logger.getLogger(CAPSiieDb.class.getName()).log(Level.SEVERE, null, ex);
         }
         
